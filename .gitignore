@@ -389,3 +389,4 @@ env/
 .local.json
 uploads/
 logs/
+/launchSettings.json
