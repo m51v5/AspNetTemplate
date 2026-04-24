@@ -1,0 +1,44 @@
+services:
+  app_db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "CHANGE_ME"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - app_net
+
+  api:
+    user: "0"
+    image: ${DOCKER_REGISTRY-}app_api
+    build:
+      context: .
+      dockerfile: AspNetTemplate/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      app_db:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/data/uploads
+      - private_data:/app/data/private
+    restart: unless-stopped
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  uploads_data:
+  private_data:
