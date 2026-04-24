@@ -16,7 +16,6 @@ A production-ready ASP.NET Core 10 Web API template with JWT authentication, rol
 | Logging | Serilog (console + rolling file) |
 | API Docs | Swagger UI + Scalar |
 | Containerization | Docker + Docker Compose |
-| CI | GitHub Actions |
 
 ---
 
@@ -32,7 +31,7 @@ AspNetTemplate/
 │   │   └── DbContexts/          # AppData DbContext, interceptors, UploadedFile entity
 │   └── Infra/
 │       ├── Attributes/          # [AutoRegister], [RoleAuthorize], [AllowedFile]
-│       ├── Extensions/          # DI wiring, app builder helpers, ClaimsPrincipal helpers
+│       ├── Extensions/          # DI wiring, app builder/logging helpers, ClaimsPrincipal helpers
 │       ├── Filters/             # GlobalExceptionFilter, SoftDeleteAccessFilter, TransactionFilter
 │       └── Helpers/             # JWT, FileHelper, UploadHelper, cleanup jobs, Swagger auth
 │
@@ -187,6 +186,10 @@ var result = await PagedList<MyDto>.Create(
 return new SuccessResponse<PagedList<MyDto>>(result);
 ```
 
+### Logging
+
+Configured via `builder.AddSerilogLogging()` in `AppBuilderExtensions`. Development mode enables `Debug`-level EF Core logs to a rolling file under `DebugEFLogs/`; production emits `Warning`+ only to a versioned rolling file under `Logs/`.
+
 ### File upload (public, served statically)
 
 Implement `IHasOptionalFile` or `IHasFile` on your entity and call:
@@ -196,17 +199,6 @@ await FileHelper.TryUploadOptionalAsync(RootPath, errorEvents, logger, _context,
 ```
 
 Files land under `data/uploads/` and are served at `/uploads/<path>`.
-
----
-
-## CI/CD
-
-GitHub Actions runs on push and pull requests to `main` / `develop`:
-
-1. **Build** — `dotnet build --configuration Release`
-2. **Docker build** — validates the multi-stage Dockerfile
-
-To enable tests, add a test project and uncomment the `dotnet test` step in `.github/workflows/ci.yml`.
 
 ---
 
