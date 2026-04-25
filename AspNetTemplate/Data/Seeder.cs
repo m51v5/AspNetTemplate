@@ -24,7 +24,7 @@ namespace AspNetTemplate.Data
 
         private static async Task SeedAdminUser(AppData db)
         {
-            if (await db.Users.AnyAsync(u => u.Id == AdminUserId)) return;
+            if (await db.Users.AnyAsync()) return;
 
             db.Users.Add(new User
             {
@@ -42,7 +42,7 @@ namespace AspNetTemplate.Data
 
         private static async Task SeedRegularUser(AppData db)
         {
-            if (await db.Users.AnyAsync(u => u.Id == RegularUserId)) return;
+            if (await db.Users.AnyAsync()) return;
 
             db.Users.Add(new User
             {
